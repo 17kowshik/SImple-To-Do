@@ -16,45 +16,27 @@ public class TaskController {
 
     @GetMapping("/tasks")
     public ResponseEntity<?> getAllTasks() {
-        List<Task> taskList = taskService.getAllTasks();
-        if (!taskList.isEmpty()) {
-            return new ResponseEntity<>(taskList, HttpStatus.OK);
-        }
-        return new ResponseEntity<>("No tasks found. Start by creating a new one!", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(taskService.getAllTasks(), HttpStatus.OK);
     }
 
     @GetMapping("/tasks/{id}")
     public ResponseEntity<?> getTaskById(@PathVariable int id) {
-        Task foundTask = taskService.getTaskById(id);
-        if (foundTask != null){
-            return new ResponseEntity<>(foundTask, HttpStatus.OK);
-        }
-        return new ResponseEntity<>("No task found with Given Id", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(taskService.getTaskById(id), HttpStatus.OK);
     }
 
     @PostMapping("/tasks")
     public ResponseEntity<?> createTask(@RequestBody Task task) {
-        Task createdTask = taskService.createTask(task);
-        if (createdTask != null) {
-            return new ResponseEntity<>(createdTask, HttpStatus.CREATED);
-        }
-        return new ResponseEntity<>("Failed to create task. Please try again.", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(taskService.createTask(task), HttpStatus.CREATED);
     }
 
     @PutMapping("/tasks/{id}")
     public ResponseEntity<?> updateTask(@PathVariable int id, @RequestBody Task task) {
-        Task updatedTask = taskService.updateTask(id, task);
-        if (updatedTask != null) {
-            return new ResponseEntity<>(updatedTask, HttpStatus.OK);
-        }
-        return new ResponseEntity<>("Task not found or update failed.", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(taskService.updateTask(id, task), HttpStatus.OK);
     }
 
     @DeleteMapping("/tasks/{id}")
     public ResponseEntity<String> deleteTask(@PathVariable int id) {
-        if (taskService.deleteTask(id)) {
-            return new ResponseEntity<>("Task deleted successfully.", HttpStatus.OK);
-        }
-        return new ResponseEntity<>("Task not found.", HttpStatus.NOT_FOUND);
+        taskService.deleteTask(id);
+        return new ResponseEntity<>("Task deleted successfully.", HttpStatus.OK);
     }
 }

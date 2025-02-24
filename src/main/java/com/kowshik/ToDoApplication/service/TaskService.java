@@ -1,5 +1,9 @@
 package com.kowshik.ToDoApplication.service;
 
+import com.kowshik.ToDoApplication.exception.TaskCreationException;
+import com.kowshik.ToDoApplication.exception.TaskDeletionException;
+import com.kowshik.ToDoApplication.exception.TaskNotFoundException;
+import com.kowshik.ToDoApplication.exception.TaskUpdateException;
 import com.kowshik.ToDoApplication.model.Task;
 import com.kowshik.ToDoApplication.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,33 +17,40 @@ public class TaskService {
     private TaskRepository taskRepository;
 
     public List<Task> getAllTasks() {
-        return taskRepository.findAll();
+        List<Task> taskList = taskRepository.findAll();
+        if (taskList.isEmpty()) {
+            throw new TaskNotFoundException("No tasks found. Start by creating a new one!");
+        }
+        return taskList;
     }
 
     public Task getTaskById(int id) {
-        return taskRepository.findById(id).orElse(null);
+        return taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException("Task with ID " + id + " not found"));
     }
 
     public Task createTask(Task task) {
-        return validateTask(task) ? taskRepository.save(task) : null;
+        if (isNotaValidTask(task)) {
+            throw new TaskCreationException("Invalid task details");
+        }
+        return taskRepository.save(task);
     }
 
     public Task updateTask(int id, Task task) {
-        if (taskRepository.existsById(id) && validateTask(task)) {
-            return taskRepository.save(task);
+        if (!taskRepository.existsById(id) || isNotaValidTask(task)) {
+            throw new TaskUpdateException("Task not found or invalid task details");
         }
-        return null;
+        return taskRepository.save(task);
     }
 
-    public boolean deleteTask(int id) {
-        if (taskRepository.existsById(id)){
-            taskRepository.deleteById(id);
-            return true;
+    public void deleteTask(int id) {
+        if (!taskRepository.existsById(id)){
+            throw new TaskDeletionException("Task not found");
         }
-        return false;
+        taskRepository.deleteById(id);
     }
 
-    private boolean validateTask(Task task){
-        return task.getName() != null && !task.getName().isBlank();
+    private boolean isNotaValidTask(Task task){
+        return task.getName() == null || task.getName().isBlank();
     }
 }
