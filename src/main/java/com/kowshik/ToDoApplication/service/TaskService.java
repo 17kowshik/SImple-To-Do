@@ -37,9 +37,13 @@ public class TaskService {
     }
 
     public Task updateTask(int id, Task task) {
-        if (!taskRepository.existsById(id) || isNotaValidTask(task)) {
-            throw new TaskUpdateException("Task not found or invalid task details");
+        if (isNotaValidTask(task)) {
+            throw new TaskUpdateException("Invalid task details");
         }
+        Task existingTask = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskUpdateException("Task with ID " + id + " not found"));
+        task.setId(existingTask.getId());
+
         return taskRepository.save(task);
     }
 

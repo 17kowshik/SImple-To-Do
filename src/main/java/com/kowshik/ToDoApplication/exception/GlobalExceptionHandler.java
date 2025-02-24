@@ -27,9 +27,19 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(generateErrorResponse(e.getMessage(), e), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({TaskCreationException.class, TaskUpdateException.class, TaskDeletionException.class})
+    @ExceptionHandler({TaskCreationException.class, TaskUpdateException.class, TaskDeletionException.class, WeakPasswordException.class})
     public ResponseEntity<ErrorResponse> handleTaskOperationException(RuntimeException e) {
         return new ResponseEntity<>(generateErrorResponse(e.getMessage(), e), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({InvalidCredentialsException.class, UnauthorizedException.class})
+    public ResponseEntity<ErrorResponse> handleInvalidCredentials(RuntimeException e) {
+        return new ResponseEntity<>(generateErrorResponse(e.getMessage(), e), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleUserAlreadyExists(UserAlreadyExistsException e) {
+        return new ResponseEntity<>(generateErrorResponse(e.getMessage(), e), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(Exception.class)
