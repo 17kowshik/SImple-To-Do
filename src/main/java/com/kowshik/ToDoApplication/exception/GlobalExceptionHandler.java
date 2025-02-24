@@ -14,32 +14,23 @@ import java.util.UUID;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private Map<String, Object> generateErrorResponse(String message) {
+    private Map<String, Object> generateErrorResponse(String message, Exception e) {
         Map<String, Object> errorResponse = new LinkedHashMap<>();
         errorResponse.put("error_id", UUID.randomUUID().toString());
         errorResponse.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")));
+        errorResponse.put("exception", e.getClass().getSimpleName());
         errorResponse.put("error", message);
         return errorResponse;
     }
 
     @ExceptionHandler(TaskNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleTaskNotFoundException(TaskNotFoundException e){
-        return new ResponseEntity<>(generateErrorResponse(e.getMessage()), HttpStatus.NOT_FOUND);
+    public ResponseEntity<Map<String, Object>> handleTaskNotFoundException(TaskNotFoundException e) {
+        return new ResponseEntity<>(generateErrorResponse(e.getMessage(), e), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(TaskCreationException.class)
-    public ResponseEntity<Map<String, Object>> handleTaskCreationException(TaskCreationException e){
-        return new ResponseEntity<>(generateErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(TaskUpdateException.class)
-    public ResponseEntity<Map<String, Object>> handleTaskUpdateException(TaskUpdateException e){
-        return new ResponseEntity<>(generateErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(TaskDeletionException.class)
-    public ResponseEntity<Map<String, Object>> handleTaskDeletionException(TaskDeletionException e){
-        return new ResponseEntity<>(generateErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+    @ExceptionHandler({TaskCreationException.class, TaskUpdateException.class, TaskDeletionException.class})
+    public ResponseEntity<Map<String, Object>> handleTaskOperationException(RuntimeException e) {
+        return new ResponseEntity<>(generateErrorResponse(e.getMessage(), e), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
