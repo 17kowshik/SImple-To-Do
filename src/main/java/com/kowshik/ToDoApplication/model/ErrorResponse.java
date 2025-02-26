@@ -10,6 +10,9 @@ import lombok.Data;
 public class ErrorResponse {
     private String errorId;
     private String timestamp;
-    private String exception;
     private String error;
+    private String exception;
+    private int statusCode;
+    private String status;
+    private String path;
 }
