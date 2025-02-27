@@ -1,0 +1,14 @@
+# Ignore local Gradle cache but keep necessary Gradle files
+.gradle/
+!gradle/wrapper/  # Allow Gradle wrapper
+
+# Ignore compiled files and local builds
+build/
+!build/libs/*.jar  # Allow built JAR files to be copied
+
+# Ignore IDE and OS-generated files
+*.iml
+.idea/
+.vscode/
+*.log
+.DS_Store
